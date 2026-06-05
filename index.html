@@ -5,36 +5,506 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>活動靈感收集板 | 創意點子庫</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
-        body { background: #f5f7fc; padding: 2rem 1.5rem; color: #1e293b; line-height: 1.5; }
-        .app-container { max-width: 1000px; margin: 0 auto; }
-        .hero { text-align: center; margin-bottom: 2rem; }
-        .hero h1 { font-size: 2rem; color: #1e2b3c; margin-bottom: 0.5rem; }
-        .form-card { background: white; border-radius: 1.5rem; padding: 1.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 2.5rem; }
-        .form-grid { display: flex; flex-wrap: wrap; gap: 1.2rem; }
-        .input-group { flex: 1; min-width: 200px; }
-        label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem; color: #475569; }
-        input, textarea { width: 100%; padding: 0.75rem 1rem; border-radius: 1rem; border: 1.5px solid #e2e8f0; font-size: 1rem; }
-        input:focus { outline: none; border-color: #2c7da0; }
-        .btn-submit { background: #2c7da0; color: white; border: none; padding: 0 2rem; border-radius: 2rem; font-weight: 700; cursor: pointer; height: 50px; align-self: flex-end; transition: 0.3s; }
-        .btn-submit:hover { background: #1f5e7a; transform: translateY(-2px); }
-        .filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .filter-group { background: #fff; padding: 0.3rem; border-radius: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .filter-btn { border: none; background: transparent; padding: 0.6rem 1.2rem; border-radius: 2rem; cursor: pointer; font-weight: 600; color: #64748b; }
-        .filter-btn.active { background: #2c7da0; color: white; }
-        .stats { font-size: 0.85rem; color: #64748b; background: #eef2f6; padding: 0.4rem 1rem; border-radius: 1rem; }
-        .records-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-        .record-card { background: white; border-radius: 1.5rem; padding: 1.5rem; border-left: 8px solid #2c7da0; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s; }
-        .record-card.done-card { border-left-color: #94a3b8; opacity: 0.7; background: #fcfcfc; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .status-badge { font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 1rem; background: #e2e8f0; }
-        .field-title { font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-top: 0.8rem; }
-        .field-content { font-size: 1rem; font-weight: 600; color: #1e293b; margin-bottom: 0.2rem; }
-        .card-actions { margin-top: 1.2rem; display: flex; justify-content: flex-end; }
-        .toggle-btn { background: #f1f5f9; border: none; padding: 0.5rem 1rem; border-radius: 1rem; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
-        .toggle-btn:hover { background: #e2e8f0; }
-        .loading-msg { text-align: center; padding: 3rem; color: #64748b; grid-column: 1/-1; }
-        footer { text-align: center; margin-top: 4rem; color: #94a3b8; font-size: 0.8rem; }
+        /* 基礎設置與現代色調變數 */
+        :root {
+            --primary: #2c7da0;
+            --primary-hover: #1f5e7a;
+            --primary-light: rgba(44, 125, 160, 0.08);
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-focus: #2c7da0;
+            
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --purple: #8b5cf6;
+            --purple-light: #f5f3ff;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+        }
+
+        body { 
+            background: var(--bg-main); 
+            padding: 3rem 1.5rem; 
+            color: var(--text-main); 
+            line-height: 1.6; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app-container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+
+        /* 標題區塊 */
+        .hero { 
+            text-align: center; 
+            margin-bottom: 3rem; 
+        }
+        .hero h1 { 
+            font-size: 2.5rem; 
+            font-weight: 850;
+            letter-spacing: -0.025em;
+            color: #1e2b3c; 
+            margin-bottom: 0.75rem; 
+            background: linear-gradient(135deg, #1e2b3c 0%, #2c7da0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* 輸入表單卡片 */
+        .form-card { 
+            background: var(--card-bg); 
+            border-radius: 1.5rem; 
+            padding: 2rem; 
+            box-shadow: var(--shadow-lg); 
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            margin-bottom: 2rem; 
+            transition: var(--transition-smooth);
+        }
+        .form-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .form-grid { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 1.5rem; 
+        }
+        .input-group { 
+            flex: 1; 
+            min-width: 220px; 
+        }
+        label { 
+            display: block; 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            margin-bottom: 0.6rem; 
+            color: var(--text-muted); 
+            letter-spacing: 0.05em;
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 0.85rem 1.2rem; 
+            border-radius: 1rem; 
+            border: 1.5px solid var(--border-color); 
+            font-size: 0.95rem; 
+            font-weight: 500;
+            background: #fff; 
+            color: var(--text-main);
+            transition: var(--transition-smooth);
+        }
+        input::placeholder {
+            color: #cbd5e1;
+        }
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: var(--border-focus); 
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background: #fff;
+        }
+        
+        /* 送出按鈕 */
+        .btn-submit { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 0 2.2rem; 
+            border-radius: 1.25rem; 
+            font-weight: 700; 
+            font-size: 1rem;
+            cursor: pointer; 
+            height: 54px; 
+            align-self: flex-end; 
+            box-shadow: 0 4px 12px rgba(44, 125, 160, 0.25);
+            transition: var(--transition-smooth);
+        }
+        .btn-submit:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(44, 125, 160, 0.35);
+        }
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+        
+        /* Dashboard 統計摘要看板 */
+        .dashboard-stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 1.2rem; 
+            margin-bottom: 3rem; 
+        }
+        .stat-card { 
+            background: var(--card-bg); 
+            padding: 1.5rem; 
+            border-radius: 1.25rem; 
+            box-shadow: var(--shadow-md); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            transition: var(--transition-smooth);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        /* 左側微光裝飾邊條 */
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: #cbd5e1;
+        }
+        .stat-card.stat-total::before { background: var(--primary); }
+        .stat-card.stat-active::before { background: var(--warning); }
+        .stat-card.stat-done::before { background: var(--success); }
+        .stat-card.stat-categories::before { background: var(--purple); }
+
+        .stat-label { 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            margin-bottom: 0.4rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+        }
+        .stat-value { 
+            font-size: 2.2rem; 
+            font-weight: 850; 
+            color: var(--text-main); 
+            line-height: 1;
+        }
+
+        /* 功能工具列 (Filter & Search) */
+        .filter-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2rem; 
+            gap: 1.2rem; 
+            flex-wrap: wrap; 
+        }
+        .filter-left-section { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.8rem; 
+            flex-wrap: wrap; 
+            flex: 1; 
+        }
+        .search-input { 
+            min-width: 220px; 
+            max-width: 320px; 
+            padding: 0.75rem 1.2rem; 
+            border-radius: 2rem; 
+            border: 1.5px solid var(--border-color); 
+            font-size: 0.9rem; 
+            font-weight: 500;
+            flex: 1; 
+            transition: var(--transition-smooth);
+        }
+        .search-input:focus { 
+            outline: none; 
+            border-color: var(--border-focus); 
+            background: #fff; 
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+        
+        /* 下拉選單特別調優 */
+        .category-select, .sort-select { 
+            min-width: 140px; 
+            max-width: 200px; 
+            padding: 0.75rem 2rem 0.75rem 1.2rem; 
+            border-radius: 2rem; 
+            border: 1.5px solid var(--border-color); 
+            font-size: 0.9rem; 
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer; 
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E") no-repeat right 1rem center;
+            background-size: 0.85rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            height: auto; 
+        }
+        .category-select:focus, .sort-select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+        
+        /* 分類篩選按鈕群組 */
+        .filter-group { 
+            background: rgba(226, 232, 240, 0.6); 
+            padding: 0.25rem; 
+            border-radius: 2rem; 
+            display: flex; 
+            gap: 0.1rem;
+        }
+        .filter-btn { 
+            border: none; 
+            background: transparent; 
+            padding: 0.6rem 1.2rem; 
+            border-radius: 2rem; 
+            cursor: pointer; 
+            font-weight: 700; 
+            font-size: 0.85rem;
+            color: var(--text-muted); 
+            transition: var(--transition-smooth);
+        }
+        .filter-btn:hover {
+            color: var(--text-main);
+        }
+        .filter-btn.active { 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* 篩選統計徽章 */
+        .stats { 
+            font-size: 0.85rem; 
+            font-weight: 700;
+            color: var(--text-muted); 
+            background: rgba(226, 232, 240, 0.5); 
+            padding: 0.5rem 1.2rem; 
+            border-radius: 2rem; 
+            white-space: nowrap; 
+            border: 1px solid rgba(226, 232, 240, 0.3);
+        }
+
+        /* 靈感卡片網格容器 */
+        .records-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 1.5rem; 
+        }
+
+        /* 靈感卡片本體 */
+        .record-card { 
+            background: var(--card-bg); 
+            border-radius: 1.5rem; 
+            padding: 1.8rem; 
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            border-left: 8px solid var(--primary); 
+            box-shadow: var(--shadow-md); 
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+        .record-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* 已完成卡片 */
+        .record-card.done-card { 
+            border-left-color: var(--text-muted); 
+            opacity: 0.75; 
+            background: #fafafc; 
+        }
+        .record-card.done-card .field-content {
+            color: var(--text-muted);
+            text-decoration: line-through;
+            text-decoration-color: rgba(100, 116, 139, 0.4);
+        }
+
+        .card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 1.2rem; 
+        }
+
+        /* 狀態徽章 */
+        .status-badge { 
+            font-size: 0.75rem; 
+            font-weight: 800; 
+            padding: 0.35rem 0.85rem; 
+            border-radius: 2rem; 
+            letter-spacing: 0.025em;
+        }
+        .record-card:not(.done-card) .status-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .record-card.done-card .status-badge {
+            background: #f1f5f9;
+            color: var(--text-muted);
+        }
+
+        /* 卡片內容欄位 */
+        .field-title { 
+            font-size: 0.7rem; 
+            font-weight: 800; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            margin-top: 0.8rem; 
+            letter-spacing: 0.08em;
+        }
+        .field-content { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            color: var(--text-main); 
+            margin-bottom: 0.2rem; 
+        }
+        .field-note {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: #f8fafc;
+            padding: 0.6rem 0.8rem;
+            border-radius: 0.75rem;
+            margin-top: 0.4rem;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            font-weight: 500;
+        }
+
+        /* 卡片互動按鈕 */
+        .card-actions { 
+            margin-top: 1.5rem; 
+            display: flex; 
+            justify-content: flex-end; 
+        }
+        .toggle-btn { 
+            background: #f1f5f9; 
+            color: var(--text-main);
+            border: none; 
+            padding: 0.6rem 1.2rem; 
+            border-radius: 1rem; 
+            font-weight: 700; 
+            font-size: 0.8rem; 
+            cursor: pointer; 
+            transition: var(--transition-smooth);
+        }
+        .toggle-btn:hover { 
+            background: #e2e8f0; 
+            transform: scale(1.03);
+        }
+        .toggle-btn:active {
+            transform: scale(1);
+        }
+        
+        /* 載入中 / 無資料訊息樣式 */
+        .loading-msg { 
+            text-align: center; 
+            padding: 4rem 2rem; 
+            color: var(--text-muted); 
+            grid-column: 1/-1; 
+            font-weight: 600;
+            background: #fff;
+            border-radius: 1.5rem;
+            border: 1.5px dashed var(--border-color);
+        }
+
+        footer { 
+            text-align: center; 
+            margin-top: 5rem; 
+            color: var(--text-muted); 
+            font-size: 0.85rem; 
+            font-weight: 500;
+        }
+
+        /* 手機板響應式排版調整 (Media Queries) */
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem 1rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .form-card {
+                padding: 1.5rem;
+                border-radius: 1.25rem;
+            }
+            .form-grid {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .input-group {
+                width: 100%;
+            }
+            .btn-submit {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+                margin-bottom: 2rem;
+            }
+            .stat-card {
+                padding: 1rem;
+                border-radius: 1rem;
+            }
+            .stat-value {
+                font-size: 1.8rem;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            .filter-left-section {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 0.8rem;
+            }
+            .search-input {
+                max-width: 100%;
+                width: 100%;
+            }
+            .category-select, .sort-select {
+                max-width: 100%;
+                width: 100%;
+            }
+            .filter-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .filter-btn {
+                flex: 1;
+                text-align: center;
+                padding: 0.6rem 0.5rem;
+            }
+            .stats {
+                width: 100%;
+                text-align: center;
+            }
+            .records-container {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -44,6 +514,7 @@
         <p>隨手記下你的創意點子｜雲端同步完成</p>
     </div>
 
+    <!-- 輸入表單卡片 -->
     <div class="form-card">
         <div class="form-grid">
             <div class="input-group">
@@ -62,11 +533,48 @@
         </div>
     </div>
 
+    <!-- Dashboard 統計摘要區塊 -->
+    <div class="dashboard-stats" id="dashboard-stats">
+        <div class="stat-card stat-total">
+            <div class="stat-label">💡 點子總數</div>
+            <div class="stat-value" id="stat-total-val">0</div>
+        </div>
+        <div class="stat-card stat-active">
+            <div class="stat-label">⚡ 進行中</div>
+            <div class="stat-value" id="stat-active-val">0</div>
+        </div>
+        <div class="stat-card stat-done">
+            <div class="stat-label">✅ 已完成</div>
+            <div class="stat-value" id="stat-done-val">0</div>
+        </div>
+        <div class="stat-card stat-categories">
+            <div class="stat-label">📂 分類總數</div>
+            <div class="stat-value" id="stat-categories-val">0</div>
+        </div>
+    </div>
+
     <div class="filter-bar">
-        <div class="filter-group">
-            <button class="filter-btn active" onclick="setFilter('all', this)">全部</button>
-            <button class="filter-btn" onclick="setFilter('active', this)">進行中</button>
-            <button class="filter-btn" onclick="setFilter('done', this)">已完成</button>
+        <div class="filter-left-section">
+            <!-- 搜尋輸入框：每次打字都會更新全域搜尋狀態 searchQuery，並觸發即時重新渲染 -->
+            <input type="text" id="search-input" class="search-input" placeholder="🔍 搜尋標題、分類或備註..." oninput="searchQuery = this.value; render();">
+            
+            <!-- 動態分類篩選下拉選單 -->
+            <select id="category-filter" class="category-select" onchange="currentCategoryFilter = this.value; render();">
+                <option value="all">📂 所有分類</option>
+            </select>
+
+            <!-- 排序規則下拉選單 -->
+            <select id="sort-select" class="sort-select" onchange="currentSort = this.value; render();">
+                <option value="newest">🕒 最新建立</option>
+                <option value="oldest">⏳ 最舊建立</option>
+                <option value="title-asc">🔤 標題 A-Z</option>
+            </select>
+            
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="setFilter('all', this)">全部</button>
+                <button class="filter-btn" onclick="setFilter('active', this)">進行中</button>
+                <button class="filter-btn" onclick="setFilter('done', this)">已完成</button>
+            </div>
         </div>
         <div class="stats" id="stats">載入中...</div>
     </div>
@@ -80,10 +588,13 @@
 
 <script>
     // 1. 填入你正式部署的 /exec 網址
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2_UuagrITJLIYcojxO0OusEAaqLgA48pO0a0TFFPdfXFT2959O_dfxS9DhXbcBpU/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaf2scCXLTDfus4noErCak8wYVQWtBFPi1LVhMXxSkFxbrTyfiAUVBR3wGJOh03Vz6bQ/exec";
 
     let records = [];
     let currentFilter = 'all';
+    let searchQuery = ''; // 用於記錄當前輸入的搜尋關鍵字
+    let currentCategoryFilter = 'all'; // 用於記錄當前選擇的分類過濾條件
+    let currentSort = 'newest'; // 用於記錄當前的排序規則 ('newest' | 'oldest' | 'title-asc')
 
     // 2. 核心：讀取資料 (處理 Redirect)
     async function fetchData() {
@@ -158,12 +669,87 @@
         render();
     }
 
+    // 提取目前所有資料中的不重複分類，並更新下拉選單選項
+    function updateCategoryDropdown() {
+        const select = document.getElementById('category-filter');
+        const savedValue = currentCategoryFilter; // 記住當前選中的分類
+        
+        // 取得所有不重複且非空的分類名稱
+        const categories = [...new Set(records
+            .map(r => r.category ? r.category.trim() : '')
+            .filter(cat => cat !== '')
+        )].sort();
+
+        // 重構選單內容
+        let optionsHtml = `<option value="all">📂 所有分類</option>`;
+        categories.forEach(cat => {
+            optionsHtml += `<option value="${cat}">${cat}</option>`;
+        });
+        select.innerHTML = optionsHtml;
+
+        // 還原先前選中的值，如果已被刪除則回歸 'all'
+        if (categories.includes(savedValue)) {
+            select.value = savedValue;
+        } else {
+            select.value = 'all';
+            currentCategoryFilter = 'all';
+        }
+    }
+
+    // 修改：疊加過濾、排序與全新「Dashboard 數據統計摘要」邏輯
     function render() {
         const list = document.getElementById('list');
-        const filtered = records.filter(r => currentFilter === 'all' || r.status === currentFilter);
+        
+        // --- 📊 全新新增：動態計算全局統計摘要數據 ---
+        const totalCount = records.length;
+        const activeCount = records.filter(r => r.status === 'active').length;
+        const doneCount = records.filter(r => r.status === 'done').length;
+        const uniqueCategories = [...new Set(records
+            .map(r => r.category ? r.category.trim() : '')
+            .filter(cat => cat !== '')
+        )];
+        const categoryCount = uniqueCategories.length;
+
+        // 將數據渲染至統計卡片
+        document.getElementById('stat-total-val').innerText = totalCount;
+        document.getElementById('stat-active-val').innerText = activeCount;
+        document.getElementById('stat-done-val').innerText = doneCount;
+        document.getElementById('stat-categories-val').innerText = categoryCount;
+        // ------------------------------------------
+
+        // 1. 同時過濾狀態(Filter)、分類(Category Filter)與搜尋內容(Search)
+        const filtered = records.filter(r => {
+            // 狀態篩選
+            const matchesFilter = currentFilter === 'all' || r.status === currentFilter;
+            
+            // 分類篩選
+            const matchesCategory = currentCategoryFilter === 'all' || 
+                (r.category && r.category.trim() === currentCategoryFilter);
+            
+            // 關鍵字搜尋
+            const query = searchQuery.trim().toLowerCase();
+            const matchesSearch = !query || 
+                (r.title && r.title.toLowerCase().includes(query)) ||
+                (r.category && r.category.toLowerCase().includes(query)) ||
+                (r.note && r.note.toLowerCase().includes(query));
+                
+            return matchesFilter && matchesCategory && matchesSearch;
+        });
+
+        // 2. 執行排序規則
+        if (currentSort === 'newest') {
+            // 最新建立：依 createdAt 由新到舊
+            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        } else if (currentSort === 'oldest') {
+            // 最舊建立：依 createdAt 由舊到新
+            filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        } else if (currentSort === 'title-asc') {
+            // 標題排序：依 title 的字母順序（支援中文語系排序）
+            filtered.sort((a, b) => (a.title || '').localeCompare(b.title || '', 'zh-TW'));
+        }
         
         if (filtered.length === 0) {
-            list.innerHTML = `<div class="loading-msg">💡 目前沒有點子，新增一個吧！</div>`;
+            list.innerHTML = `<div class="loading-msg">💡 沒有符合條件的點子，試試換個關鍵字或分類吧！</div>`;
         } else {
             list.innerHTML = filtered.map(r => `
                 <div class="record-card ${r.status === 'done' ? 'done-card' : ''}">
@@ -174,7 +760,7 @@
                     <div class="field-content">${r.title}</div>
                     <div class="field-title">分類</div>
                     <div class="field-content">${r.category}</div>
-                    ${r.note ? `<div class="field-title">備註</div><div class="field-content" style="font-size:0.85rem; color:#64748b">${r.note}</div>` : ''}
+                    ${r.note ? `<div class="field-title">備註</div><div class="field-note">${r.note}</div>` : ''}
                     <div class="card-actions">
                         <button class="toggle-btn" onclick="toggleStatus('${r.id}')">
                             ${r.status === 'active' ? '完成它' : '重啟'}
@@ -183,7 +769,12 @@
                 </div>
             `).join('');
         }
-        document.getElementById('stats').innerText = `總計 ${records.length} 個點子`;
+        
+        // 動態更新下拉選單（在更新統計與清單後進行，以確保資料同步）
+        updateCategoryDropdown();
+
+        // 動態更新篩選統計摘要：符合條件數 / 總計數
+        document.getElementById('stats').innerText = `符合條件 ${filtered.length} / 總計 ${records.length} 個點子`;
     }
 
     // 初始化讀取
